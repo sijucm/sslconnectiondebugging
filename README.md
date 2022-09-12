@@ -36,7 +36,7 @@ openssl s_client -connect serverurl:9092 \
 ## to inspect the certificates
 openssl s_client \
 -showcerts \
--connect distdbk1-wez1.launcher.int.abnamro.com:9092 \
+-connect distdbk1.launcher.int.com:9092 \
 < /dev/null
 
 
@@ -47,13 +47,13 @@ docker push ocadevecr.azurecr.io/oca-commercial_eligibility/busyboxopenssl
 
 
 ## download server certificate to local file
-openssl s_client -connect distdbk1-wez1.launcher.int.abnamro.com:9092 -showcerts  --verify 5 |  awk '/BEGIN CERTIFICATE/,/END CERTIFICATE/{ if(/BEGIN CERTIFICATE/){a++}; out="cert"a".pem"; print >out}'
+openssl s_client -connect distdbk1.launcher.int.com:9092 -showcerts  --verify 5 |  awk '/BEGIN CERTIFICATE/,/END CERTIFICATE/{ if(/BEGIN CERTIFICATE/){a++}; out="cert"a".pem"; print >out}'
 
 ## move the above downloade files to a name that matches the certificate
 for cert in *.pem; do newname=$(openssl x509 -noout -subject -in $cert | sed -nE 's/.*CN ?= ?(.*)/\1/; s/[ ,.*]/_/g; s/__/_/g; s/_-_/ -/; s/^_//g;p' | tr '[:upper:]' '[:lower:]').pem
 
 ## connect to open ssl
-openssl s_client -connect distdbk1-wez1.launcher.int.abnamro.com:9092 -CAfile siju/cacerts/abn_amro_bank_infra_ca_g2_et_ou_\=_abn_amro_ciso_o_\=_abn_amro_bank_n_v__l_\=_amsterdam_c_\=_nl.pem -tls1_2 -brief -cert client-cert1.pem -key client-key1.pem
+openssl s_client -connect distdbk1.launcher.int.com:9092 -CAfile siju/cacerts/infra_ca_g2_et_ou_\=_ciso_o_\=__bank_n_v__l_\=_amsterdam_c_\=_nl.pem -tls1_2 -brief -cert client-cert1.pem -key client-key1.pem
 
 ## Run the Docker image created above from a repository. Usedd along with docker file from this repository
 kubectl run kafkadebug1 -i --tty --rm --image=ocadevecr.azurecr.io/reponame:v20220902.18 --restart=Never -- sh
@@ -64,14 +64,14 @@ keytool -importkeystore -srckeystore ../pim-d-sql-kv-pim-d-kafka-consumer-cert-2
 java \
 -cp sijukafkachecktemp-1.0.0-SNAPSHOT-all.jar \
 -Djavax.net.debug=all \
-com.abnamro.siju.tools.httpscall.ApiClient theUrlToCall keystore.jks
+com.siju.tools.httpscall.ApiClient theUrlToCall keystore.jks
 
 -Djdk.httpclient.HttpClient.log=ssl \
 -Djdk.httpclient.HttpClient.log=requests
 
 
 ##add a downloaded certificate to the truststore
-keytool -import -file abnca/cert2.pem  -alias firstCA -keystore truststore.jks
+keytool -import -file ca/cert2.pem  -alias firstCA -keystore truststore.jks
 
 ##convert keystore type to jks
 keytool -importkeystore -destkeystore client_keystore.jks -deststoretype jks -deststorepass changeit -srckeystore keystore.jks  -srcstoretype pkcs12 -srcstorepass changeit
