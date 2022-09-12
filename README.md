@@ -86,3 +86,43 @@ keytool -keypasswd -new password1 -keystore client_keystore.jks -storepass chang
 kubectl exec --tty --stdin -n service $podname -- /bin/sh
 
 
+##Service principal create done through the pipeline
+# first create a service principal. In some orgs through a pipeline. It does not matter where and which RG
+sp_password=$(az ad sp create-for-rbac \
+--name http://xyz-pull \
+--scope /scope/sdsd/sdsd/sdsds \
+--role acrpull \
+--query password \
+-o tsv)
+
+##get the app Id of the service principal
+spAppId=$(az ad sp show --id 040590d0-f189-4918-a80d-14cc963ae2f7 --query appId -o tsv)
+
+## user name is the app id and the passowrd in ABN Amro SP is stored in the keyvault
+docker login sanacr1453.azurecr.io  --username $spAppId --password FZs8Q~FH7VFSql3VNzjTJZf-oA3WC2MlH~4pUdvI
+
+az acr build -t sample/spring-boot:v1 -r ocadevecr .
+
+##Probably run it with a pipeline if there is no permission
+az role assignment create --assignee 040590d0-f189-4918-a80d-14cc963ae2f7 \
+--role acrPull \
+--scope $acrregistryid
+
+az role assignment create --assignee 040590d0-f189-4918-a80d-14cc963ae2f7 \
+--role acrPush \
+--scope $acrregistryid
+
+docker build -t sslconnectiondebugging:v4 .
+docker tag sslconnectiondebugging:v4 ocadevecr.azurecr.io/sslconnectiondebugging:v4
+docker push ocadevecr.azurecr.io/sslconnectiondebugging:v4
+
+kubectl run kafkadebug1 -i --tty --rm --image=ocadevecr.azurecr.io/spring-app:v2 --restart=Never -- sh
+
+kubectl -n service get secrets custom-keystore -o jsonpath --template '{.data}'
+## copy above to separate files for keystore.txt and trusstore.txt
+cat keystore.txt | base64 --decode > keystore.jks
+
+
+## it expects the jks files in the root. Otherwise change the path
+java -cp .:sslconnectiondebugging-1.0.0-SNAPSHOT-all.jar  com.siju.tools.kafkaclient.KafkaClientMain
+

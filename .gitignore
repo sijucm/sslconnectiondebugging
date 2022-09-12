@@ -2,3 +2,5 @@
 /.gradle/
 /.idea/
 .DS_Store
+keystore.jks
+truststore.jks

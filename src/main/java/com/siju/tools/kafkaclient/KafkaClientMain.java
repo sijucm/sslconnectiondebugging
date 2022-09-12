@@ -87,7 +87,7 @@ public class KafkaClientMain {
       throws UnrecoverableKeyException, KeyStoreException, NoSuchAlgorithmException, IOException,
           CertificateException {
 
-    loadtemp();
+    //loadtemp();
 //    keystoreWithKeyNotHavingPassword();
     //    keystoreWithKeyPassword();
 
