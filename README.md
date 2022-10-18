@@ -103,20 +103,20 @@ docker login sanacr1453.azurecr.io  --username $spAppId --password FZs8Q~FH7VFSq
 
 az acr build -t sample/spring-boot:v1 -r ecrname .
 
-##Use service principal to directly push into acr with acr build. This way the docker login is not used
-#Giving the role Contributor to the service principal
+## Use service principal to directly push into acr with acr build. This way the docker login is not used
+# Giving the role Contributor to the service principal
 New-AzRoleAssignment -ObjectId 5sdfsdfsdf78868sd7f678678asdas `
 -RoleDefinitionName Contributor `
 -Scope /subscriptions/39999999999999999999999999999/resourceGroups/resourcegroupname/providers/Microsoft.ContainerRegistry/registries/ecrname
 
-#Logging in as the service principal
+# Logging in as the service principal
 az login --service-principal -u ef7923q94829034877f -p SaeadsasdasdasdasdasdadsasdasdadD --tenant 3aasdasdasdasd-asdasdasdasdasdasd
 
-#Then build directly in ACR
+# Then build directly in ACR
 az acr build --subscription 375555555555555555555555555 -t sample/hello-world:1 -r ecrname .
 
 
-##Probably run it with a pipeline if there is no permission
+## Probably run it with a pipeline if there is no permission
 az role assignment create --assignee 040590d0-f189-4918-a80d-14cc963ae2f7 \
 --role acrPull \
 --scope $acrregistryid
