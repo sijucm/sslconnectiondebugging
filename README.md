@@ -4,26 +4,28 @@
 # sslconnectiondebugging
 Various tools to debug ssl connection
 
-#Docker file
+# Docker file
 The container has tools to debug the SSL connection. This includes openssl tools, nodejs, 
 java, keytool, etc
 
-#HTTPS call
+# HTTPS call
 The https call package has calls to create ssl context from a keystore and also from
 Azure keyvault and call an HTTPS endpoint
 
-#Kafka client
+# Kafka client
 The kafka client is a standalone client that can connect to a kafka broker to check the
 connection. This was the original purpose to create this repository and for that reason
 this is kept as it is
 
-#Commands that can be used along with a kubernetes environment debugging
+# Commands that can be used along with a kubernetes environment debugging
 
 ## login to the cluster
-#pimclustername=kubecluster-aks
-#az aks get-credentials \
+
+clustername=kubecluster-aks
+
+az aks get-credentials \
 --resource-group $resourcegroup \
---name $pimclustername \
+--name $clustername \
 --subscription $subscription \
 --admin
 
